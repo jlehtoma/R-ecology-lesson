@@ -338,7 +338,7 @@ res <- surveys %>%
 
 ## Tidying data with tidyr
 
-[tidyr](http://blog.rstudio.org/2014/07/22/introducing-tidyr/) is new package 
+[tidyr](http://blog.rstudio.org/2014/07/22/introducing-tidyr/) is package 
 that makes it easy to "tidy" your data. Tidy data is data that's easy to work 
 with: it's easy to munge (with `dplyr`), visualise (with `ggplot2`) 
 and model (with R’s hundreds of modelling packages). The two most important 
