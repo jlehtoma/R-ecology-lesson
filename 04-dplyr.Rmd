@@ -13,11 +13,12 @@ surveys <- read.csv("data/portal_data_joined.csv")
 
 > ## Learning Objectives
 >
-> * Learn basic utilities of the dplyr package
+> * Learn basic utilities of the dplyr and tidyr packages
 > * Select and filter data
 > * Be able to use magrittr pipes
 > * Create new columns with mutate()
 > * Use the split-apply-combine paradigm to summarize data
+> * Create tidy data from messy data
 > * Export data with write.csv()
 
 ------------
@@ -74,13 +75,13 @@ We're going to learn some of the most common `dplyr` functions: `select()`,
 data frame, use `select()`. The first argument to this function is the data
 frame (`surveys`), and the subsequent arguments are the columns to keep.
 
-```{r, results = 'hide', purl = FALSE}
+```{r, echo = FALSE, results = 'hide', purl = FALSE}
 select(surveys, plot_id, species_id, weight)
 ```
 
 To choose rows, use `filter()`:
 
-```{r, purl = FALSE}
+```{r, message = FALSE, purl = FALSE}
 filter(surveys, year == 1995)
 ```
 
@@ -98,7 +99,7 @@ directly to the next, which is useful when you need to do many things to the sam
 data set.  Pipes in R look like `%>%` and are made available via the `magrittr`
 package installed as part of `dplyr`.
 
-```{r, purl = FALSE}
+```{r, message = FALSE, purl = FALSE}
 surveys %>%
   filter(weight < 5) %>%
   select(species_id, sex, weight)
@@ -113,7 +114,7 @@ it as an argument to these functions anymore.
 If we wanted to create a new object with this smaller version of the data we
 could do so by assigning it a new name:
 
-```{r, purl = FALSE}
+```{r, message = FALSE, purl = FALSE}
 surveys_sml <- surveys %>%
   filter(weight < 5) %>%
   select(species_id, sex, weight)
@@ -129,7 +130,7 @@ Note that the final data frame is the leftmost part of this expression.
 >  and retain the columns `year`, `sex`, and `weight.`
 
 <!---
-```{r, eval=FALSE, purl=FALSE}
+```{r, message = FALSE, purl=FALSE}
 ## Answer
 surveys %>%
     filter(year < 1995) %>%
@@ -146,7 +147,7 @@ columns. For this we'll use `mutate()`.
 
 To create a new column of weight in kg:
 
-```{r, purl = FALSE}
+```{r, message = FALSE, , purl = FALSE}
 surveys %>%
   mutate(weight_kg = weight / 1000)
 ```
@@ -155,7 +156,7 @@ If this runs off your screen and you just want to see the first few rows, you
 can use a pipe to view the `head()` of the data (pipes work with non-dplyr
 functions too, as long as the `dplyr` or `magrittr` packages are loaded).
 
-```{r, purl = FALSE}
+```{r, message = FALSE,  purl = FALSE}
 surveys %>%
   mutate(weight_kg = weight / 1000) %>%
   head
@@ -164,7 +165,7 @@ surveys %>%
 The first few rows are full of NAs, so if we wanted to remove those we could
 insert a `filter()` in this chain:
 
-```{r, purl = FALSE}
+```{r, message = FALSE, purl = FALSE}
 surveys %>%
   filter(!is.na(weight)) %>%
   mutate(weight_kg = weight / 1000) %>%
@@ -185,7 +186,7 @@ The `!` symbol negates it, so we're asking for everything that is not an `NA`.
 >  **Hint**: think about how the commands should be ordered to produce this data frame!
 
 <!---
-```{r, eval=FALSE, purl=FALSE}
+```{r, message = FALSE, purl=FALSE}
 ## Answer
 surveys_hindfoot_half <- surveys %>%
     filter(!is.na(hindfoot_length)) %>%
@@ -210,7 +211,7 @@ group into a single-row summary of that group.  `group_by()` takes as argument
 the column names that contain the **categorical** variables for which you want
 to calculate the summary statistics. So to view mean the `weight` by sex:
 
-```{r, purl = FALSE}
+```{r, message = FALSE,  purl = FALSE}
 surveys %>%
   group_by(sex) %>%
   summarize(mean_weight = mean(weight, na.rm = TRUE))
@@ -218,7 +219,7 @@ surveys %>%
 
 You can group by multiple columns too:
 
-```{r, purl = FALSE}
+```{r, message = FALSE,  purl = FALSE}
 surveys %>%
   group_by(sex, species_id) %>%
   summarize(mean_weight = mean(weight, na.rm = TRUE))
@@ -231,7 +232,7 @@ Number"). To avoid this, we can remove the missing values for weight before we
 attempt to calculate the summary statistics on weight. Because the missing
 values are removed, we can omit `na.rm=TRUE` when computing the mean:
 
-```{r, purl = FALSE}
+```{r, message = FALSE, purl = FALSE}
 surveys %>%
   filter(!is.na(weight)) %>%
   group_by(sex, species_id) %>%
@@ -248,19 +249,19 @@ function at the end with the argument `n` specifying the number of rows to
 display:
 
 
-```{r, purl = FALSE}
+```{r, message = FALSE, purl = FALSE}
 surveys %>%
   filter(!is.na(weight)) %>%
   group_by(sex, species_id) %>%
   summarize(mean_weight = mean(weight)) %>%
-  print(n=15)
+  print(n = 15)
 ```
 
 Once the data is grouped, you can also summarize multiple variables at the same
 time (and not necessarily on the same variable). For instance, we could add a
 column indicating the minimum weight for each species for each sex:
 
-```{r, purl = FALSE}
+```{r,message = FALSE, purl = FALSE}
 surveys %>%
   filter(!is.na(weight)) %>%
   group_by(sex, species_id) %>%
@@ -277,7 +278,7 @@ observations found for each factor or combination of factors. For this, `dplyr`
 provides `tally()`. For example, if we wanted to group by sex and find the
 number of rows of data for each sex, we would do:
 
-```{r, purl = FALSE}
+```{r, message = FALSE, purl = FALSE}
 surveys %>%
   group_by(sex) %>%
   tally()
@@ -291,7 +292,7 @@ counts the total number of records for each category.
 > How many individuals were caught in each `plot_type` surveyed?
 
 <!---
-```{r, echo=FALSE, purl=FALSE}
+```{r, message = FALSE, purl=FALSE}
 ## Answer
 surveys %>%
     group_by(plot_type) %>%
@@ -305,7 +306,7 @@ surveys %>%
 > length for each species (using `species _id`).
 
 <!---
-```{r, echo=FALSE, purl=FALSE}
+```{r, message = FALSE, purl=FALSE}
 ## Answer
 surveys %>%
     filter(!is.na(hindfoot_length)) %>%
@@ -325,7 +326,7 @@ surveys %>%
 
 <!---
 ## Answer
-```{r, echo=FALSE, purl=FALSE}
+```{r, message=FALSE, purl=FALSE}
 res <- surveys %>%
     filter(!is.na(weight)) %>%
     group_by(year) %>%
@@ -334,6 +335,98 @@ res <- surveys %>%
     arrange(year)
 ```
 --->
+
+## Tidying data with tidyr
+
+[tidyr](http://blog.rstudio.org/2014/07/22/introducing-tidyr/) is new package 
+that makes it easy to "tidy" your data. Tidy data is data that's easy to work 
+with: it's easy to munge (with `dplyr`), visualise (with `ggplot2`) 
+and model (with R’s hundreds of modelling packages). The two most important 
+properties of tidy data are:
+
+* Each column is a variable.
+* Each row is an observation.
+* What was tidy data again? [Slides about tidyr and dplyr](http://bit.ly/2015-11-10-idiv-dplyr-tidyr)
+
+### Messing up the data: creating a pivot table
+
+First, let's count the number of species observed per year.
+
+```{r message=FALSE, purl=FALSE}
+species_yearly <- surveys %>%
+  select(species_id, year) %>% 
+  filter(species_id != "") %>% 
+  group_by(species_id, year) %>% 
+  summarize(
+    count = n()
+  )
+```
+
++ `spread()`: Spread a key-value pair across multiple columns.
++ Next, let's tell `spread()` we want to use column `year` as a key and
+`count` as a value. T
+
+```{r message=FALSE, purl=FALSE}
+library("tidyr")    ## load the package
+
+species_yearly_pivot <- species_yearly %>%   
+  spread(year, count)
+```
+
+Having those NAs is a bit annoying, so let's call them 0:
+
+```{r message=FALSE, purl=FALSE}
+species_yearly_pivot <- species_yearly %>%   
+  spread(year, count, fill = 0)
+```
+
+Can we combine `tidyr` functions with `dplyr`? Yes we can:
+
+```{r message=FALSE, purl=FALSE}
+species_yearly_pivot <- surveys %>%
+  select(species_id, year) %>% 
+  filter(species_id != "") %>% 
+  group_by(species_id, year) %>% 
+  summarize(
+    count = n()
+  ) %>% 
+  spread(year, count, fill = 0)
+```
+
+### Tidying up the data again
+
+Pivot tables may be useful for inspecting the data with quick glance,
+but not much else. With another function from `tidyr`, `gather()`, we can quickly
+transform the pivot table back to tidy data. `gather()` takes multiple columns and 
+collapses into key-value pairs, duplicating all other columns as needed. You use 
+`gather()` when you notice that you have columns that are not variables.
+
+```{r message=FALSE, purl=FALSE}
+species_yearly_tidy <- species_yearly_pivot %>% 
+  gather(year, count, -species_id) 
+```
+
+> ### Challenge {.challenge}
+>
+> Download a messy version of the surveys data and see how you could 
+> tidy it up using the tools from tidyr-package.
+
+```{r, message=FALSE}
+# Don't usually do this!
+download.file("http://bit.ly/dc-messy-data", "data/messy_survey_data.csv")
+```
+```{r, message=FALSE, eval=TRUE}
+messy_survey_data <- read.csv("data/messy_survey_data.csv")
+head(messy_survey_data)
+```
+
+<!--
+```{r, message=FALSE, echo=FALSE, purl=FALSE}
+## Answer
+tidy_survey_data <- messy_survey_data %>% 
+  spread(variable, measurement)
+```
+-->
 
 # Exporting data
 
@@ -363,7 +456,7 @@ this dataset, the missing species are represented by an empty string and not an
 of animals for which the sex has been determined:
 
 
-```{r, purl=FALSE}
+```{r, message=FALSE, purl=FALSE}
 surveys_complete <- surveys %>%
   filter(species_id != "",         # remove missing species_id
          !is.na(weight),           # remove missing weight
@@ -378,7 +471,7 @@ we are going to create a dataset that counts how often each species has been
 observed, and filter out the rare species; then, we will extract only the
 observations for these more common species:
 
-```{r, purl=FALSE}
+```{r, message=FALSE, purl=FALSE}
 ## Extract the most common species_id
 species_counts <- surveys_complete %>%
                   group_by(species_id) %>%
@@ -405,7 +498,7 @@ write.csv(surveys_complete, file="data_output/surveys_complete.csv",
           row.names=FALSE)
 ```
 
-```{r, purl=FALSE, eval=TRUE, echo=FALSE}
+```{r, eval=FALSE, purl=FALSE, eval=TRUE, echo=FALSE}
 if (!file.exists("data_output")) dir.create("data_output")
 write.csv(surveys_complete, file = "data_output/surveys_complete.csv")
 ```
