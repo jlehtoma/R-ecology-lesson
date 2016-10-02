@@ -1,6 +1,6 @@
 ---
 layout: topic
-title: Manipulating and analyzing data with dplyr; Exporting data
+title: Manipulating and analyzing data with dplyr and tidyr; Exporting data
 author: Data Carpentry contributors
 ---
 
