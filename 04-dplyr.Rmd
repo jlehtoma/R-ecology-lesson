@@ -411,7 +411,7 @@ species_yearly_tidy <- species_yearly_pivot %>%
 > Download a messy version of the surveys data and see how you could 
 > tidy it up using the tools from tidyr-package.
 
-```{r, message=FALSE}
+```{r, message=FALSE, eval=FALSE}
 # Don't usually do this!
 download.file("http://bit.ly/dc-messy-data", "data/messy_survey_data.csv")
 ```
