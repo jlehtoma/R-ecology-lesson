@@ -152,6 +152,7 @@ $(document).ready(function () {
 <div id="selecting-columns-and-filtering-rows" class="section level2">
 <h2>Selecting columns and filtering rows</h2>
 <p>We’re going to learn some of the most common <code>dplyr</code> functions: <code>select()</code>, <code>filter()</code>, <code>mutate()</code>, <code>group_by()</code>, and <code>summarize()</code>. To select columns of a data frame, use <code>select()</code>. The first argument to this function is the data frame (<code>surveys</code>), and the subsequent arguments are the columns to keep.</p>
+<pre class="r"><code>select(surveys, plot_id, species_id, weight)</code></pre>
 <p>To choose rows, use <code>filter()</code>:</p>
 <pre class="r"><code>filter(surveys, year == 1995)</code></pre>
 </div>
